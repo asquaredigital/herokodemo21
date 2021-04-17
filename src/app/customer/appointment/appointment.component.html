@@ -1,0 +1,244 @@
+<div class="page-container">
+<div class="pageheading">
+    Appointment
+</div>
+<div class="page-content">
+<div class="action-button-container" [hidden]="(role=='carer')" >
+    <button  (click)="openModel();"  class="create-user-button" >Create Appointment</button>
+</div>
+
+<div class="table-responsive" [hidden]="(role=='carer')" > 
+    <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Carer</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Services</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let appointment of appointments" >
+               
+                <td>
+                        <span>{{appointment.client.name}}</span>
+                </td>
+                <td>
+                        <span>{{appointment.agents[0].name}}</span>
+                </td>
+                <td>
+                        <span>{{appointment.appointment_start_time  | date:'medium'}}</span>
+                 </td>
+                 <td>
+                        <span>{{appointment.appointment_end_time  | date:'medium'}}</span>
+                 </td>
+                 <td>
+                         <button (click)="openService(appointment);" class="btn btn-primary">Details</button>
+                 </td>               
+            </tr>    
+        </tbody>
+    </table>
+</div>
+
+<div class="table-responsive" [hidden]="(role!='carer')" > 
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Carer</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Services</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let appointment of appointments" >
+                <td>
+                    <span>{{appointment.id}}</span>
+                </td>
+                <td>
+                        <span>{{appointment.client.name}}</span>
+                </td>
+                <td>
+                        <span>{{appointment.agents[0].name}}</span>
+                </td>
+                <td>
+                        <span>{{appointment.appointment_start_time  | date:'medium'}}</span>
+                 </td>
+                 <td>
+                        <span>{{appointment.appointment_end_time  | date:'medium'}}</span>
+                 </td>
+                 <td>
+                         <button (click)="openService(appointment);" class="btn btn-primary">Details</button>
+                 </td>
+                 <td>
+                         <button [hidden]="(appointment.status[0].status!='open')"   (click)="checkIn(appointment);" class="btn btn-primary">Check IN</button>
+
+                         <button  [hidden]="(appointment.status[0].status!='inprogress')"  (click)="openCheckOut(appointment);" class="btn btn-primary">Checkout</button>
+
+                         <span [hidden]="(appointment.status[0].status!='completed')" >Completed</span>
+                 </td>               
+            </tr>    
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<ng-template #serviceDetails >
+      <div class="modal-header" >
+        <h4 class="modal-title pull-left">Service Details</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeModel()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>Client Name : {{currentClient}}</div>
+        <div>Carer Name : {{currentCarer}}</div>
+        <h5>Services</h5>
+         <ul>
+          <li *ngFor="let serv of currentServices" >
+              {{serv}}
+          </li>
+         </ul>
+         <h5>Notes</h5>
+         <div>{{currentNotes}}</div>
+      </div>
+      <div class="modal-footer">        
+      </div> 
+  </ng-template>
+
+  <ng-template #checkoutDetails >
+      <div class="modal-header" >
+        <h4 class="modal-title pull-left">Checkout Details</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeModel()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>Client Name : {{currentClient}}</div>
+        <div>Carer Name : {{currentCarer}}</div>
+        <br/><br/>
+        <h5>Services</h5>
+          <div class="services" *ngFor="let serv of currentServices"  ><input (change)="completedservice($event,serv)" type="checkbox" name="checkServ">{{serv}}</div><br/><br/>
+         <h5>Notes</h5>
+         <div><textarea [(ngModel)] ="checkNotes" class="form-control-right" ></textarea></div>
+         <br/>
+         <div><button  type="button" (click)="Checkout(currentAppointment.id)" class="btn btn-success">Submit</button>
+         </div>
+      </div>
+      <div class="modal-footer">        
+      </div> 
+  </ng-template>
+
+
+ <ng-template #modaltemplate >
+      <div class="modal-header" >
+        <h4 class="modal-title pull-left">Create Appointment</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeModel()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <form   [formGroup]="userForm" (ngSubmit)="createUser()" >
+  <div class="form-group-right">
+        <div class="form-label-right"><label for="agent" class="">Carer</label></div>
+        <select formControlName="agent" class="form-control-right" >
+          <option value="" selected="selected">Select Carer</option>
+          <option *ngFor="let agent of agents"  value="{{agent.id}}">{{agent.name}}</option>
+          
+        </select>
+         <div *ngIf="isSubmitted && formControls.agent.errors" class="help-block">
+      <div *ngIf="formControls.agent.errors.required"><span class="error-span popup-error">Agent is required</span></div>
+      
+    </div>
+  </div>
+
+   <div class="form-group-right">
+        <div class="form-label-right"><label for="client" class="">Client</label></div>
+        <select formControlName="client" (change)="onselectClient($event.target.value)" class="form-control-right" >
+          <option value="" selected="selected">Select Client</option>
+         <option *ngFor="let client of clients"  value="{{client.id}}">{{client.name}}</option>
+        </select>
+         <div *ngIf="isSubmitted && formControls.client.errors" class="help-block">
+      <div *ngIf="formControls.client.errors.required"><span class="error-span popup-error">Client is required</span></div>
+      
+    </div>
+  </div>
+ 
+  <div class="form-group-right">
+        <div class="form-label-right"><label for="start" class="">Start Time</label></div>
+          <input  type="datetime-local"
+            placeholder="Choose date" formControlName="start"
+            class="form-control-right"
+            >
+             <div *ngIf="isSubmitted && formControls.start.errors" class="help-block">
+      <div *ngIf="formControls.start.errors.required"><span class="error-span popup-error">Date of Birth is required</span></div>
+      
+    </div>
+  </div>
+
+   <div class="form-group-right">
+        <div class="form-label-right"><label for="end" class="">End Time</label></div>
+          <input  type="datetime-local" 
+            placeholder="Choose date" formControlName="end"
+            class="form-control-right"
+            >
+             <div *ngIf="isSubmitted && formControls.end.errors" class="help-block">
+      <div *ngIf="formControls.end.errors.required"><span class="error-span popup-error">Date of Birth is required</span></div>
+      
+    </div>
+  </div>
+ 
+  <div class="form-group-right">
+        <div class="form-label-right"><label for="gender" class="">Services</label></div>
+        
+        <div>
+            <div class="services" *ngFor="let serv of currentServices"  ><input (change)="chooseservice($event,serv)" type="checkbox" name="serv">{{serv}}</div>
+        </div>
+  </div>
+
+   <div class="form-group-right" style="float: left;width: 100%">
+        <div class="form-label-right"><label for="notes" class="">Notes</label></div>
+        <div>
+        <textarea formControlName="notes" class="form-control-right" >
+          
+        </textarea>
+      </div>
+         <div *ngIf="isSubmitted && formControls.client.errors" class="help-block">
+      <div *ngIf="formControls.client.errors.required"><span class="error-span popup-error">Client is required</span></div>
+      
+    </div>
+  </div>
+  <div class="form-group-right">
+    <div class="form-label-right"><label for="reoccur" class="">Re-occurrance</label></div>
+    <div class="weekday">
+    <input   formControlName="reoccur" name="reoccur" placeholder="Enter your Reoccurance" id="reoccur" type="checkbox" value="true"  >
+    </div>
+   
+  </div>
+  <div class="form-group-right" *ngIf="formControls.reoccur.value">
+    <div class="form-label-right"><label for="orders" class="">Weekdays</label></div>
+    <div class="weekday" formArrayName="orders">
+    <span [formGroupName]="i" *ngFor="let item of userForm.controls?.orders?.controls; let i = index" >
+      <input type="checkbox" formControlName="checked" />  {{orders[i].name}} &nbsp; |&nbsp;
+    
+  </span>
+  
+ </div>
+  </div>
+          <br/>
+          <div class="form-group">
+            <button  [disabled]="isDisabled"  type="submit" class="btn btn-success">Submit</button>
+          </div>
+         
+        </form>
+      </div>
+      <div class="modal-footer">        
+      </div> 
+  </ng-template>
+
+

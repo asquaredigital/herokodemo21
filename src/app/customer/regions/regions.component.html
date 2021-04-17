@@ -1,0 +1,99 @@
+<div class="page-container">
+<div class="pageheading">
+    Regions
+</div>
+<div class="page-content">
+<div class="action-button-container">
+    <button  (click)="openModel();"  class="create-user-button" >Create Region</button>
+</div>
+
+<div class="table-responsive"> 
+    <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
+        <thead>
+            <tr>
+                
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let region of regions" >
+              
+               
+                <td>
+                        <span>{{region.name}}</span>
+                </td>
+                <td>
+                        <span>{{region.address}}</span>
+                </td>
+                <td>
+                        <span>{{region.phone}}</span>
+                 </td>               
+                 <td>
+                        <span>{{region.email}}</span>
+                 </td>               
+            </tr>    
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+ <ng-template #modaltemplate >
+      <div class="modal-header" >
+        <h4 class="modal-title pull-left">Create Group</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeModel()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+         <form   [formGroup]="userForm" (ngSubmit)="createRegions()" >
+  <div class="form-group-right">
+    <div class="form-label-right"><label for="region_name" class="">Region Name</label></div>
+    <input autocomplete="off" formControlName="region_name" name="groupname" placeholder="Enter Region name" required="" id="region_name" type="text" class="form-control-right" >
+    <div *ngIf="isSubmitted && formControls.region_name.errors" class="help-block">
+      <div *ngIf="formControls.region_name.errors.required"><span class="error-span popup-error">Region Name is required</span></div>
+      
+    </div>
+  </div>
+  <div class="form-group-right">
+    <div class="form-label-right"><label for="region_address" class="">Address</label></div>
+    <input autocomplete="off" formControlName="region_address" name="groupname" placeholder="Enter Address" required="" id="region_address" type="text" class="form-control-right" >
+    <div *ngIf="isSubmitted && formControls.region_address.errors" class="help-block">
+      <div *ngIf="formControls.region_address.errors.required"><span class="error-span popup-error">Address is required</span></div>
+      
+    </div>
+  </div>
+  <div class="form-group-right">
+    <div class="form-label-right"><label for="region_phone" class="">Phone</label></div>
+    <input autocomplete="off" formControlName="region_phone" name="groupname" placeholder="Enter PhoneNumber" required="" id="region_phone" type="text" class="form-control-right" >
+    <div *ngIf="isSubmitted && formControls.region_phone.errors" class="help-block">
+      <div *ngIf="formControls.region_phone.errors.required"><span class="error-span popup-error">Phone is required</span></div>
+      
+    </div>
+  </div>
+  <div class="form-group-right">
+    <div class="form-label-right"><label for="region_email" class="">Email</label></div>
+    <input autocomplete="off" formControlName="region_email" name="groupname" placeholder="Enter email" required="" id="region_email" type="text" class="form-control-right" >
+    <div *ngIf="isSubmitted && formControls.region_email.errors" class="help-block">
+      <div *ngIf="formControls.region_email.errors.required"><span class="error-span popup-error">Email is required</span></div>
+      
+    </div>
+  </div>
+
+
+   
+          
+          <div class="form-group">
+            <button  [disabled]="isDisabled"  type="submit" class="btn btn-success">Submit</button>
+          </div>
+         
+        </form>
+      </div>
+      <div class="modal-footer">        
+      </div> 
+  </ng-template>
+
+
